@@ -1,12 +1,12 @@
-function [fit_params,bestInlierSet,bestOutlierSet]= CircFit(r,theta,d,n)
+function [fit_params,bestInlierSet,bestOutlierSet]= CircFit(points,d,n)
 %eliminate zeros
-index=find(r~=0 & r<3);
-r_clean=r(index);
-theta_clean=theta(index);
+%index=find(r~=0 & r<3);
+%r_clean=r(index);
+%theta_clean=theta(index);
 
 %convert to Cartesian and plot again for verification
-[x,y]=pol2cart(deg2rad(theta_clean),r_clean);
-points=[x,y];
+%[x,y]=pol2cart(deg2rad(theta_clean),r_clean);
+%points=[x,y];
 
  bestcandidates = [];
  bestInlierSet = zeros(0,2);

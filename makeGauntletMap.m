@@ -19,17 +19,17 @@ for i = 1:length(oris_GN)
     LFramePoints = [r_all(:,i).*cos(theta_all(:,i)), r_all(:,i).*sin(theta_all(:,i))]';
     LFramePoints(3,:) = 1;
     
-    figure;
-    scatter(LFramePoints(1,:), LFramePoints(2,:));
-    title(["Scan", num2str(i), "in LIDAR Frame"]);
+%     figure;
+%     scatter(LFramePoints(1,:), LFramePoints(2,:));
+%     title(["Scan", num2str(i), "in LIDAR Frame"]);
     
     NFramePoints = T_NL*LFramePoints;
     
-    figure;
-    scatter(NFramePoints(1,:), NFramePoints(2,:));
-    title(["Scan", num2str(i), "in Neato Frame"]);
+%     figure;
+%     scatter(NFramePoints(1,:), NFramePoints(2,:));
+%     title(["Scan", num2str(i), "in Neato Frame"]);
     
-    GFramePoints = [1, 0, O_GN(i,1); 0, 1, O_GN(i,2); 0, 0, 1]*[cos(oris_GN(i)), -sin(oris_GN(i)), 0; sin(oris_GN(i)), cos(oris_GN(i)), 0; 0, 0, 1]*NFramePoints;
+    GFramePoints(:, end+1) = [1, 0, O_GN(i,1); 0, 1, O_GN(i,2); 0, 0, 1]*[cos(oris_GN(i)), -sin(oris_GN(i)), 0; sin(oris_GN(i)), cos(oris_GN(i)), 0; 0, 0, 1]*NFramePoints;
     
     figure(Map);
     scatter(GFramePoints(1,:), GFramePoints(2,:));
