@@ -1,7 +1,7 @@
 load('myGauntletScans.mat','r_all','theta_all');
 
 %name key - G (global) N (neato) L (LIDAR)
-
+n
 %Neato origin with relation to Global
 O_GN = [0, 0; 0, 0; 0, -2; 2, -1];
 %Neato Orientation with relation to Global
@@ -12,7 +12,8 @@ O_NL = [-0.084; 0];
 %Translation matrix from Lidar to Neato Frame
 T_NL = [1, 0, O_NL(1); 0, 1, O_NL(2); 0, 0, 1];
 
-Map = figure;
+%Map = figure;
+GFramePoints=[0;0;1];
 
 % for each scan
 for i = 1:length(oris_GN)
@@ -29,12 +30,14 @@ for i = 1:length(oris_GN)
 %     scatter(NFramePoints(1,:), NFramePoints(2,:));
 %     title(["Scan", num2str(i), "in Neato Frame"]);
     
-    GFramePoints(:, end+1) = [1, 0, O_GN(i,1); 0, 1, O_GN(i,2); 0, 0, 1]*[cos(oris_GN(i)), -sin(oris_GN(i)), 0; sin(oris_GN(i)), cos(oris_GN(i)), 0; 0, 0, 1]*NFramePoints;
+    GFramePoints = horzcat(GFramePoints,[1, 0, O_GN(i,1); 0, 1, O_GN(i,2); 0, 0, 1]*[cos(oris_GN(i)), -sin(oris_GN(i)), 0; sin(oris_GN(i)), cos(oris_GN(i)), 0; 0, 0, 1]*NFramePoints);
     
-    figure(Map);
-    scatter(GFramePoints(1,:), GFramePoints(2,:));
-    hold on
-    title("All Scans in Global Frame")
+    %figure(Map);
+    %scatter(GFramePoints(1,:), GFramePoints(2,:));
+    %hold on
+    %title("All Scans in Global Frame")
 end
-figure(Map);
+GFramePoints = GFramePoints(:, 2:end);
+scatter(GFramePoints(1,:), GFramePoints(2,:));
+%figure(Map);
     

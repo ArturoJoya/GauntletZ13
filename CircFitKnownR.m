@@ -1,4 +1,4 @@
-function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(r,theta,d,n,R)
+function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(points,d,n,R)
 % %eliminate zeros
 % index=find(r~=0 & r<3);
 % r_clean=r(index);
@@ -7,7 +7,7 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(r,theta,d,n,R)
 % %convert to Cartesian and plot again for verification
 % [x,y]=pol2cart(deg2rad(theta_clean),r_clean);
 % points=[x,y];
-
+ candpts = [0,0];
  bestcandidates = [];
  bestInlierSet = zeros(0,2);
  bestOutlierSet = zeros(0,2);
@@ -17,7 +17,12 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(r,theta,d,n,R)
  
  for l=1:n
      %obtain points to find a candidate circle
-     candpts = datasample(points, 3, 'Replace', false);
+     %uncomment if Statistics and Machine Learning Toolbox
+     %candpts = datasample(points, 3, 'Replace', false);
+     indeces = randperm(length(points),3);
+     for i = 1:length(indeces)
+         candpts(i,:) = points(indeces(i),:);
+     end
      dists = [];
      
      %generate candidate circle parameters from candidate circle points
@@ -57,21 +62,25 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(r,theta,d,n,R)
  end
 
 %plot the polar data as verification
-figure(1)
-polarplot(deg2rad(theta_clean),r_clean,'ks','MarkerSize',6,'MarkerFaceColor','m')
-title('Visualization of Polar Data')
+%figure(1)
+%polarplot(deg2rad(theta_clean),r_clean,'ks','MarkerSize',6,'MarkerFaceColor','m')
+%title('Visualization of Polar Data')
 
-figure(2)
-plot(x,y,'ks')
-title('Scan Data- Clean')
-xlabel('[m]')
-ylabel('[m]')
+%figure(2)
+%plot(points(:,1),points(:,2),'ks')
+%title('Scan Data- Clean')
+%xlabel('[m]')
+%ylabel('[m]')
 
 %Now we need to plot our results
 figure(3)
+t = linspace(0,2*pi,100);
+x_cir = fit_params(1) + R*cos(t);
+y_cir = fit_params(2) + R*sin(t);
 plot(bestInlierSet(:,1), bestInlierSet(:,2), 'ks')
 hold on
 plot(bestOutlierSet(:,1),bestOutlierSet(:,2),'bs')
+plot(x_cir, y_cir);
 %plot(bestEndPoints(:,1), bestEndPoints(:,2), 'r')
 legend('Inliers','Outliers','Best Fit','location','northwest')
 title(['RANSAC with d=' num2str(d) ' and n=' num2str(n)])
