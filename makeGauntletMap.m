@@ -1,9 +1,9 @@
 load('myGauntletScans.mat','r_all','theta_all');
 
 %name key - G (global) N (neato) L (LIDAR)
-n
+
 %Neato origin with relation to Global
-O_GN = [0, 0; 0, 0; 0, -2; 2, -1];
+O_GN = [1.9, -2.7; 0, 0; 0, -2; 1.9, -1];
 %Neato Orientation with relation to Global
 oris_GN = [0; -pi/4; 0; pi];
 
@@ -37,6 +37,8 @@ for i = 1:length(oris_GN)
     %hold on
     %title("All Scans in Global Frame")
 end
+clf
+figure(1)
 GFramePoints = GFramePoints(:, 2:end);
 scatter(GFramePoints(1,:), GFramePoints(2,:));
 %figure(Map);

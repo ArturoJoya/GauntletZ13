@@ -8,7 +8,7 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(points,d,n,R)
 % [x,y]=pol2cart(deg2rad(theta_clean),r_clean);
 % points=[x,y];
  candpts = [0,0];
- bestcandidates = [];
+ %bestcandidates = [];
  bestInlierSet = zeros(0,2);
  bestOutlierSet = zeros(0,2);
  bestEndPoints = zeros(0,2);
@@ -18,11 +18,11 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(points,d,n,R)
  for l=1:n
      %obtain points to find a candidate circle
      %uncomment if Statistics and Machine Learning Toolbox
-     %candpts = datasample(points, 3, 'Replace', false);
-     indeces = randperm(length(points),3);
-     for i = 1:length(indeces)
-         candpts(i,:) = points(indeces(i),:);
-     end
+     candpts = datasample(points, 3, 'Replace', false);
+     %indeces = randperm(length(points),3);
+     %for i = 1:length(indeces)
+     %    candpts(i,:) = points(indeces(i),:);
+     %end
      dists = [];
      
      %generate candidate circle parameters from candidate circle points
@@ -56,8 +56,8 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(points,d,n,R)
      if sum(inliers) > size(bestInlierSet,1);
         bestInlierSet=points(inliers, :); %points where logical array is true
         bestOutlierSet = points(~inliers, :); %points where logical array is not true
-        bestcandidates=candpts;
-        fit_params = [h k rad];
+        %bestcandidates=candpts;
+        fit_params = [center(1) center(2) rad];
      end
  end
 
@@ -73,7 +73,8 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(points,d,n,R)
 %ylabel('[m]')
 
 %Now we need to plot our results
-figure(3)
+clf
+figure(2)
 t = linspace(0,2*pi,100);
 x_cir = fit_params(1) + R*cos(t);
 y_cir = fit_params(2) + R*sin(t);
@@ -87,8 +88,9 @@ title(['RANSAC with d=' num2str(d) ' and n=' num2str(n)])
 xlabel('[m]')
 ylabel('[m]')
 % Create textbox
-annotation(figure(3),'textbox',...
+annotation(figure(2),'textbox',...
     [0.167071428571429 0.152380952380952 0.25 0.1],...
     'String',{'Number of Inliers:' num2str(size(bestInlierSet,1))},...
     'FitBoxToText','off');
+
 end

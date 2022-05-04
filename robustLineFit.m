@@ -1,4 +1,4 @@
-function [fitline_coefs,bestInlierSet,bestOutlierSet,bestEndPoints]= robustLineFit(r,theta,d,n,visualize)
+function [fitline_coefs,bestInlierSet,bestOutlierSet,bestEndPoints]= robustLineFit(x,y,d,n,visualize)
 %The [fitline_coefs,bestInlierSet,bestOutlierSet,bestEndPoints]= robustLineFit(r,theta,d,n) 
 %function runs the RANSAC algorithm for n candidate lines and a threshold of d. The inputs r and
 %theta are polar coordinates. The output fitline_coefs are the coefficients
@@ -11,12 +11,12 @@ function [fitline_coefs,bestInlierSet,bestOutlierSet,bestEndPoints]= robustLineF
  end
 
 %eliminate zeros
-index=find(r~=0 & r<3);
-r_clean=r(index);
-theta_clean=theta(index);
-
-%convert to Cartesian and plot again for verification
-[x,y]=pol2cart(deg2rad(theta_clean),r_clean);
+% index=find(r~=0 & r<3);
+% r_clean=r(index);
+% theta_clean=theta(index);
+% 
+% %convert to Cartesian and plot again for verification
+% [x,y]=pol2cart(deg2rad(theta_clean),r_clean);
 points=[x,y];
 
 %now let's actually implement the RANSAC algorithm
@@ -73,7 +73,7 @@ for k=1:n %number of candidate lines to try
     %Now, we check if the number of inliers is greater than the best we
     %have found. If so, the candidate line is our new best candidate. We
     %also make sure there are no big gaps.
-    if biggestGap < 0.2  && sum(inliers) > size(bestInlierSet,1)
+    if biggestGap < 0.25  && sum(inliers) > size(bestInlierSet,1)
 %          if sum(inliers) > size(bestInlierSet,1)
         bestInlierSet=points(inliers,:); %points where logical array is true
         bestOutlierSet = points(~inliers, :); %points where logical array is not true
@@ -102,10 +102,10 @@ fitline_coefs=[m b];
 
 if visualize==1
 
-%plot the polar data as verification
-figure(1)
-polarplot(deg2rad(theta_clean),r_clean,'ks','MarkerSize',6,'MarkerFaceColor','m')
-title('Visualization of Polar Data')
+% %plot the polar data as verification
+% figure(1)
+% polarplot(deg2rad(theta_clean),r_clean,'ks','MarkerSize',6,'MarkerFaceColor','m')
+% title('Visualization of Polar Data')
 
 figure(2)
 plot(x,y,'ks')
