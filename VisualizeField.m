@@ -1,7 +1,6 @@
 %Gauntlet Challenge Visualizations
-
 close all
-load myGauntletMap
+load ('myGauntletMap.mat', 'GFramePoints')
 
 %define Neato parameters
 base = 0.235; %m
@@ -16,7 +15,6 @@ title('Scan Data- Clean')
 xlabel('[m]')
 ylabel('[m]')
 
-bestOutlierSet=points;
 nn=1;
 visualize=0;
 d=0.018;
@@ -25,8 +23,16 @@ n=6000;
 f = 0;
 fx = 0;
 fy = 0;
+
+%initialize syms for the Neato to use based on the points fitted
+%establish potential field equations
+syms xN yN a b
+poteq = log(sqrt((xN-a).^2 +(yN-b).^2));
+fNeato = 0;
 %global points
 [xG,yG]=meshgrid(-1:0.01:2,-3:0.01:1);
+
+bestOutlierSet = points;
 
 while size(bestOutlierSet,1) > 30
     [fitline_coefs(nn,:),bestInlierSet,bestOutlierSet,bestEndPoints(:,:,nn)]= robustLineFit(x,y,d,n,visualize);
@@ -41,6 +47,9 @@ while size(bestOutlierSet,1) > 30
     f = f - log(sqrt((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2));
     fx = fx - (xG-bestInlierSet(i,1))./((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2);
     fy = fy - (yG-bestInlierSet(i,2))./((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2);
+    
+    %generate potential field for Neato to compute in real time
+    fNeato = fNeato - subs(poteq,[a,b], [bestInlierSet(i,1), bestInlierSet(i,2)]);
     end
     
     %generate the points to feed back into the robustLineFit function
@@ -58,11 +67,12 @@ R = 0.25;
 
 %generate sinks from circle fit
 for t = linspace(0,2*pi,450)
-    a = fit_params(1) + R*cos(t);
-    b = fit_params(2) + R*sin(t);
-    f = f + log(sqrt((xG-a).^2 +(yG-b).^2));
-    fx = fx + (xG-a)./((xG-a).^2 +(yG-b).^2);
-    fy = fy + (yG-b)./((xG-a).^2 +(yG-b).^2);
+    aC = fit_params(1) + R*cos(t);
+    bC = fit_params(2) + R*sin(t);
+    f = f + log(sqrt((xG-aC).^2 +(yG-bC).^2));
+    fx = fx + (xG-aC)./((xG-aC).^2 +(yG-bC).^2);
+    fy = fy + (yG-bC)./((xG-aC).^2 +(yG-bC).^2);
+    fNeato = fNeato + subs(poteq,[a,b], [aC,bC]);
 end
 
 t = linspace(0,2*pi,100);

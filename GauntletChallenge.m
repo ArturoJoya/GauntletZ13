@@ -14,51 +14,58 @@ lambda = 0.05;
 d = 0.005; %m
 n = 1000; %iterations for circle fit
 R = 0.25; %m
-GFramePoints = [];
+%GFramePoints = [];
 
 %establish potential field equations
-syms x y a b
-poteq = log(sqrt((x-a).^2 +(y-b).^2));
-f = 0;
-visf = 0;
-visgrad = [0;0];
+%syms x y a b
+%poteq = log(sqrt((x-a).^2 +(y-b).^2));
+%gradxeq = (x-a)./((x-a).^2 +(y-b).^2);
+%gradyeq = (y-b)./((x-a).^2 +(y-b).^2);
+fNeato = 0;
 
-%Create Gauntlet Map from points scanned in real time
-collectScans
-makeGauntletMap
-GFramePoints = GFramePoints(1:2,:)';
+%Visualize field and create syms equations
+VisualizeField
+%generate gradient for Neato to use
+gradNeato = gradient(fNeato, [xN, yN]);
 
-[xGlobal,yGlobal]=meshgrid(-3:0.05:3,-3:0.05:3);
-
-[fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(GFramePoints,d,n,R);
-for i = 1:length(bestInlierSet)
-    f = f + subs(poteq,[a,b], [bestInlierSet(i,1), bestInlierSet(i,2)]);
-end
-for j = 1:length(bestOutlierSet)
-    f = f - subs(poteq,[a,b], [bestOutlierSet(j,1), bestOutlierSet(j,2)]);
-end
-grad = gradient(f, [x, y]);
-
-for k = 1:length(xGlobal)
-    for l = 1:length(yGlobal)
-        visf(end+1) = subs(f, [x,y], [xGlobal(k), yGlobal(l)]);
-        visgrad(:,end+1) = subs(grad, [x,y], [xGlobal(k), yGlobal(l)]);
-    end
-end
-
-%define BoB
-t = linspace(0,2*pi,100);
-x_cir = fit_params(2) + R*cos(t);
-y_cir = fit_params(3) + R*sin(t);
-
-clf
-figure();
-contour(xGlobal,yGlobal,visf, 'k', 'ShowText', 'On')
-hold on
-quiver(xGlobal,yGloval,visgrad(1,:),visgrad(2,:))
-plot(x_cir, y_cir);
-axis equal
-hold off
+% 
+% %Create Gauntlet Map from points scanned in real time
+% collectScans
+% makeGauntletMap
+% GFramePoints = GFramePoints(1:2,:)';
+% 
+% [xGlobal,yGlobal]=meshgrid(-3:0.05:3,-3:0.05:3);
+% %TODO fix function to be more accurate
+% [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(GFramePoints,d,n,R);
+% %TODO, condense f so that subbing in values takes less time 
+% for i = 1:length(bestInlierSet)
+%     f = f + subs(poteq,[a,b], [bestInlierSet(i,1), bestInlierSet(i,2)]);
+% end
+% for j = 1:length(bestOutlierSet)
+%     f = f - subs(poteq,[a,b], [bestOutlierSet(j,1), bestOutlierSet(j,2)]);
+% end
+% grad = gradient(f, [x, y]);
+% 
+% for k = 1:length(xGlobal)
+%     for l = 1:length(yGlobal)
+%         visf(end+1) = subs(f, [x,y], [xGlobal(k), yGlobal(l)]);
+%         visgrad(:,end+1) = subs(grad, [x,y], [xGlobal(k), yGlobal(l)]);
+%     end
+% end
+% 
+% %define BoB
+% t = linspace(0,2*pi,100);
+% x_cir = fit_params(1) + R*cos(t);
+% y_cir = fit_params(2) + R*sin(t);
+% 
+% clf
+% figure();
+% contour(xGlobal,yGlobal,visf, 'k', 'ShowText', 'On')
+% hold on
+% quiver(xGlobal,yGloval,visgrad(1,:),visgrad(2,:))
+% plot(x_cir, y_cir);
+% axis equal
+% hold off
 
 head = [0;1];
 pos = [0;2];
