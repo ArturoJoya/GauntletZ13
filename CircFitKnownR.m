@@ -18,11 +18,11 @@ function [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(points,d,n,R)
  for l=1:n
      %obtain points to find a candidate circle
      %uncomment if Statistics and Machine Learning Toolbox
-     candpts = datasample(points, 3, 'Replace', false);
-     %indeces = randperm(length(points),3);
-     %for i = 1:length(indeces)
-     %    candpts(i,:) = points(indeces(i),:);
-     %end
+     %candpts = datasample(points, 3, 'Replace', false);
+     indeces = randperm(length(points),3);
+     for i = 1:length(indeces)
+         candpts(i,:) = points(indeces(i),:);
+     end
      dists = [];
      
      %generate candidate circle parameters from candidate circle points

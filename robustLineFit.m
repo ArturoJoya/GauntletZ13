@@ -29,7 +29,11 @@ for k=1:n %number of candidate lines to try
     
     %select two points at random using the 'datasample' function to define
     %the endpoints of the first candidate fit line
-    candidates = datasample(points, 2, 'Replace', false);
+    %candidates = datasample(points, 2, 'Replace', false);
+    indeces = randperm(length(points),3);
+    for i = 1:length(indeces)
+        candidates(i,:) = points(indeces(i),:);
+    end
     
     %Find the vector that points from point 2 to point 1
     v=(candidates(1,:)-candidates(2,:))';
