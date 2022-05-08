@@ -9,7 +9,7 @@ R = [r_i]
 
 while (n < n_max) && (norm((double(subs(grad, {xN, yN}, {r_i(1), r_i(2)}))))> tol)
     um = double(subs(grad, {xN, yN}, {r_i(1), r_i(2)}))
-    r_i = r_i + lam*(double(subs(grad, {xN, yN}, {r_i(1), r_i(2)})))
+    r_i = r_i + lam.*um %(double(subs(grad, {xN, yN}, {r_i(1), r_i(2)})))
     grad_i = (double(subs(grad, {xN, yN}, {r_i(1), r_i(2)})))
     lam = delta * lam;
     n = n + 1
