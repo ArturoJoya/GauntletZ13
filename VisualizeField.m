@@ -30,7 +30,7 @@ syms xN yN a b
 poteq = log(sqrt((xN-a).^2 +(yN-b).^2));
 fNeato = 0;
 %global points
-[xG,yG]=meshgrid(-1:0.01:2,-3:0.01:1);
+[xG,yG]=meshgrid(-5:0.01:5,-5:0.01:5);
 
 bestOutlierSet = points;
 
@@ -44,12 +44,12 @@ while size(bestOutlierSet,1) > 30
     
     %create the sources from lines defined by inliers
     for i = 1:length(bestInlierSet)
-    f = f - log(sqrt((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2));
-    fx = fx - (xG-bestInlierSet(i,1))./((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2);
-    fy = fy - (yG-bestInlierSet(i,2))./((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2);
+    f = f + log(sqrt((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2));
+    fx = fx + (xG-bestInlierSet(i,1))./((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2);
+    fy = fy + (yG-bestInlierSet(i,2))./((xG-bestInlierSet(i,1)).^2 +(yG-bestInlierSet(i,2)).^2);
     
     %generate potential field for Neato to compute in real time
-    fNeato = fNeato - subs(poteq,[a,b], [bestInlierSet(i,1), bestInlierSet(i,2)]);
+    fNeato = fNeato + subs(poteq,[a,b], [bestInlierSet(i,1), bestInlierSet(i,2)]);
     end
     
     %generate the points to feed back into the robustLineFit function
@@ -66,14 +66,18 @@ R = 0.25;
 [fit_params,bestInlierSet,bestOutlierSet]= CircFitKnownR(bestOutlierSet,d,n,R);
 
 %generate sinks from circle fit
-for t = linspace(0,2*pi,450)
+for t = linspace(0,2*pi,1000)
     aC = fit_params(1) + R*cos(t);
     bC = fit_params(2) + R*sin(t);
-    f = f + log(sqrt((xG-aC).^2 +(yG-bC).^2));
-    fx = fx + (xG-aC)./((xG-aC).^2 +(yG-bC).^2);
-    fy = fy + (yG-bC)./((xG-aC).^2 +(yG-bC).^2);
-    fNeato = fNeato + subs(poteq,[a,b], [aC,bC]);
+    f = f - log(sqrt((xG-aC).^2 +(yG-bC).^2));
+    fx = fx - (xG-aC)./((xG-aC).^2 +(yG-bC).^2);
+    fy = fy - (yG-bC)./((xG-aC).^2 +(yG-bC).^2);
+    fNeato = fNeato - subs(poteq,[a,b], [aC,bC]);
 end
+
+%generate gradient for Neato to use
+gradNeato = gradient(fNeato, [xN, yN]);
+
 
 t = linspace(0,2*pi,100);
 x_cir = fit_params(1) + R*cos(t);

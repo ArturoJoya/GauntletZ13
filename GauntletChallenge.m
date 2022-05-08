@@ -18,8 +18,6 @@ fNeato = 0;
 
 %Visualize field and create syms equations
 VisualizeField
-%generate gradient for Neato to use
-gradNeato = gradient(fNeato, [xN, yN]);
 
 %set up Neato
 head = [1;0];
