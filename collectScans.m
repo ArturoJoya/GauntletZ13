@@ -1,7 +1,7 @@
 sub = rossubscriber('/scan');
 
 % place Neato at the origin pointing in the ihat_G direction
-placeNeato(0,0,1,0)
+placeNeato(1.9,-2.7,1,0)
 
 % wait a while for the Neato to fall into place
 pause(2);
@@ -36,7 +36,7 @@ theta_3 = deg2rad([0:359]');
 
 % place Neato at an arbitrary position and orientation
 % TODO: you must modify this next line of code!
-placeNeato(2,-1,cos(pi),sin(pi))
+placeNeato(1.9,-1,cos(pi),sin(pi))
 
 % wait a while for the Neato to fall into place
 pause(2);
