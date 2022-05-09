@@ -72,7 +72,7 @@ for i = 1:length(square_centers)
     end
 end
 %BoB
-for t = linspace(0,2*pi,100)
+for t = linspace(0,2*pi,175)
     aC = 0.75 + 0.25*cos(t);
     bC = -2.5 + 0.25*sin(t);
     f = f - log(sqrt((xG-aC).^2 +(yG-bC).^2));
@@ -102,7 +102,7 @@ axis equal
 
 
 %Run gradient ascent
-r_i = [0.25; -0.6];
+r_i = [0; 0];
 delta = 0.9;% delta > 1 causes stepsize to grow; this prevents convergence
 lam = 0.05;
 tol = 1e-3;
