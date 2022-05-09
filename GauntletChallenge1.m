@@ -36,25 +36,25 @@ fNeato = 0;
 [xG,yG]=meshgrid(-5:0.01:5,-5:0.01:5);
 
 %Outline
-for aO = -1.5:0.05:2.5
-    f = f + log(sqrt((xG-aO).^2 + (yG-1).^2)) - log(sqrt((xG-aO).^2 + (yG+3.37).^2));
-    fx = fx + (xG-aO)./((xG-aO).^2 +(yG-1).^2) - (xG-aO)./((xG-aO).^2 +(yG+3.37).^2);
-    fy = fy + (yG-1)./((xG-aO).^2 +(yG-1).^2) - (yG+3.37)./((xG-aO).^2 +(yG+3.37).^2);
-    fNeato = fNeato + subs(poteq,[a,b], [aO,1]) - subs(poteq,[a,b], [aO,-3.37]);
+for aO = -1.2:0.05:2.2
+    f = f + log(sqrt((xG-aO).^2 + (yG-0.7).^2)) - log(sqrt((xG-aO).^2 + (yG+3.07).^2));
+    fx = fx + (xG-aO)./((xG-aO).^2 +(yG-0.7).^2) - (xG-aO)./((xG-aO).^2 +(yG+3.07).^2);
+    fy = fy + (yG-0.7)./((xG-aO).^2 +(yG-0.7).^2) - (yG+3.37)./((xG-aO).^2 +(yG+3.07).^2);
+    fNeato = fNeato + subs(poteq,[a,b], [aO,0.7]) - subs(poteq,[a,b], [aO,-3.07]);
     figure(2)
     hold on
-    plot(aO,-3.37, 'r.')
-    plot(aO,1,'r.')
+    plot(aO,-3.07, 'r.')
+    plot(aO,0.7,'r.')
 end
-for bO = -3.37:0.05:1
-    f = f + log(sqrt((xG+1.5).^2 + (yG-bO).^2)) - log(sqrt((xG-2.5).^2 + (yG-bO).^2));
-    fx = fx + (xG+1.5)./((xG+1.5).^2 +(yG-bO).^2) - (xG-2.5)./((xG-2.5).^2 +(yG-bO).^2);
-    fy = fy + (yG-bO)./((xG+1.5).^2 +(yG-bO).^2) - (yG-bO)./((xG-2.5).^2 +(yG-bO).^2);
+for bO = -3.07:0.05:0.7
+    f = f + log(sqrt((xG+1.2).^2 + (yG-bO).^2)) - log(sqrt((xG-2.2).^2 + (yG-bO).^2));
+    fx = fx + (xG+1.2)./((xG+1.2).^2 +(yG-bO).^2) - (xG-2.2)./((xG-2.2).^2 +(yG-bO).^2);
+    fy = fy + (yG-bO)./((xG+1.2).^2 +(yG-bO).^2) - (yG-bO)./((xG-2.2).^2 +(yG-bO).^2);
     fNeato = fNeato + subs(poteq,[a,b], [-1.5,bO]) - subs(poteq,[a,b], [2.5,bO]);
     figure(2)
     hold on
-    plot(-1.5,bO,'r.')
-    plot(2.5,bO,'r.')
+    plot(-1.2,bO,'r.')
+    plot(2.2,bO,'r.')
 end
 %Squares as circles
 square_centers = [-0.25, -1; 1, -0.7; 1.41, -2]; 
@@ -91,14 +91,35 @@ quiver(xG,yG,fx,fy)
 axis equal
 
 %Run gradient ascent
-r_0 = [0, 0];
-delta = 0.9; % delta > 1 causes stepsize to grow; this prevents convergence
-lambda_0 = 0.05;
-tolerance = 1e-3;
-n_max = 25;
+%r_0 = [0, 0];
+%delta = 0.9; % delta > 1 causes stepsize to grow; this prevents convergence
+%lambda_0 = 0.05;
+%tolerance = 1e-3;
+%n_max = 25;
 
 % Run the algorithm
-R = gradient_ascend(gradNeato, r_0, delta, lambda_0, tolerance, n_max);
+%R = gradient_ascend(gradNeato, r_0, delta, lambda_0, tolerance, n_max);
+
+
+%Run gradient ascent
+r_i = [0.25; -0.6];
+delta = 0.9;% delta > 1 causes stepsize to grow; this prevents convergence
+lam = 0.05;
+tol = 1e-3;
+n = 0;
+n_max = 25;
+grad_i = double(subs(gradNeato, {xN, yN}, {r_i(1), r_i(2)}));
+R = [r_i];
+
+% Run the algorithm
+%R = gradient_ascend(gradNeato, r_0, delta, lambda_0, tolerance, n_max);
+while (n < n_max) && (norm(grad_i)> tol)
+    r_i = r_i + lam.*grad_i;
+    grad_i = (double(subs(gradNeato, {xN, yN}, {r_i(1), r_i(2)})));
+    lam = delta * lam;
+    n = n + 1;
+    R(:, end+1) = r_i;
+end
 
 figure(2);
 plot(R(:, 1), R(:, 2), "r")
@@ -108,7 +129,7 @@ plot(R(end, 1), R(end, 2), "r.", "MarkerSize", 20)
 
 %set up Neato
 head = [1;0];
-pos = [0;0];
+pos = [0.25;-0.6];
 NeatoPath = [0,0];
 
 angSpeed = 0.2;  %rad/s (set higher than real to help with testing)
@@ -130,7 +151,7 @@ pause(2);
 reachedbob = false;
 while ~reachedbob
     %get gradient of position (for ascent
-    gradVal = (double(subs(gradNeato, {xN, yN}, {pos(1), pos(2)})));
+    gradVal = double(subs(gradNeato, {xN, yN}, {pos(1), pos(2)}));
     crossProd = cross([head; 0], [gradVal; 0]);
     turnDir = sign(crossProd(3));
     turnAngle = asin(norm(crossProd)/(norm(head)*norm(gradVal)));
