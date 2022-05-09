@@ -1,4 +1,3 @@
-function NeatoPath = GauntletChallenge1()
 
 load myGauntletmap.mat
 %Function for completing level 1 of the gauntlet challenge
@@ -105,67 +104,3 @@ plot(R(:, 1), R(:, 2), "r")
 plot(R(:, 1), R(:, 2), "r.", "MarkerSize", 10)
 plot(R(1, 1), R(1, 2), "k.", "MarkerSize", 20)
 plot(R(end, 1), R(end, 2), "r.", "MarkerSize", 20)
-
-%set up Neato
-head = [1;0];
-pos = [0;0];
-NeatoPath = [0,0];
-
-angSpeed = 0.2;  %rad/s (set higher than real to help with testing)
-linSpeed = 0.5;  %m/s
-
-%setup publisher
-pub = rospublisher('/raw_vel');
-sub_states = rossubscriber('/gazebo/model_states', 'gazebo_msgs/ModelStates');
-msg = rosmessage(pub);
-%stop robot
-msg.Data = [0, 0];
-send(pub, msg);
-pause(2);
-
-%place Neato at starting location
-placeNeato(pos(1), pos(2), head(1), head(2));
-pause(2);
-
-reachedbob = false;
-while ~reachedbob
-    %get gradient of position (for ascent
-    gradVal = (double(subs(gradNeato, {xN, yN}, {pos(1), pos(2)})));
-    crossProd = cross([head; 0], [gradVal; 0]);
-    turnDir = sign(crossProd(3));
-    turnAngle = asin(norm(crossProd)/(norm(head)*norm(gradVal)));
-    turnTime = double(turnAngle) / angSpeed;
-    msg.Data = [-turnDir*angSpeed*base/2,
-                turnDir*angSpeed*base/2];
-    send(pub, msg);
-    startTurn = rostic;
-    while rostoc(startTurn) < turnTime
-        pause(0.01);
-    end
-    head = gradVal;
-    
-    %act on robot
-    fwdDist = norm(gradVal*lambda);
-    fwdTime = fwdDist / linSpeed;
-    msg.Data = [linSpeed, linSpeed];
-    send(pub, msg);
-    startFwd = rostic;
-    while rostoc(startFwd) < fwdTime
-        nmsg = receive(sub_states);
-        for j = 1 : length(nmsg.Name)
-            if strcmp(nmsg.Name{j}, 'neato_standalone')
-                posX = nmsg.Pose(j).Position.X;
-                posY = nmsg.Pose(j).Position.Y;
-            end
-        end
-        NeatoPath(end+1,:) = [posX, posY];
-        pause(0.01)
-    end
-    % update position for the next iteration
-    pos = pos + gradVal*lambda;
-    reachedbob = fwdDist < 0.01;
-end
-msg.Data = [0, 0];
-send(pub, msg);
-
-end
