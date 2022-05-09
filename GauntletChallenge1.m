@@ -37,20 +37,20 @@ fNeato = 0;
 
 %Outline
 for aO = -1.2:0.05:2.2
-    f = f + log(sqrt((xG-aO).^2 + (yG-0.7).^2)) - log(sqrt((xG-aO).^2 + (yG+3.07).^2));
-    fx = fx + (xG-aO)./((xG-aO).^2 +(yG-0.7).^2) - (xG-aO)./((xG-aO).^2 +(yG+3.07).^2);
-    fy = fy + (yG-0.7)./((xG-aO).^2 +(yG-0.7).^2) - (yG+3.37)./((xG-aO).^2 +(yG+3.07).^2);
-    fNeato = fNeato + subs(poteq,[a,b], [aO,0.7]) - subs(poteq,[a,b], [aO,-3.07]);
+    f = f + log(sqrt((xG-aO).^2 + (yG-0.7).^2)) + log(sqrt((xG-aO).^2 + (yG+3.07).^2));
+    fx = fx + (xG-aO)./((xG-aO).^2 +(yG-0.7).^2) + (xG-aO)./((xG-aO).^2 +(yG+3.07).^2);
+    fy = fy + (yG-0.7)./((xG-aO).^2 +(yG-0.7).^2) + (yG+3.37)./((xG-aO).^2 +(yG+3.07).^2);
+    fNeato = fNeato + subs(poteq,[a,b], [aO,0.7]) + subs(poteq,[a,b], [aO,-3.07]);
     figure(2)
     hold on
     plot(aO,-3.07, 'r.')
     plot(aO,0.7,'r.')
 end
 for bO = -3.07:0.05:0.7
-    f = f + log(sqrt((xG+1.2).^2 + (yG-bO).^2)) - log(sqrt((xG-2.2).^2 + (yG-bO).^2));
-    fx = fx + (xG+1.2)./((xG+1.2).^2 +(yG-bO).^2) - (xG-2.2)./((xG-2.2).^2 +(yG-bO).^2);
-    fy = fy + (yG-bO)./((xG+1.2).^2 +(yG-bO).^2) - (yG-bO)./((xG-2.2).^2 +(yG-bO).^2);
-    fNeato = fNeato + subs(poteq,[a,b], [-1.5,bO]) - subs(poteq,[a,b], [2.5,bO]);
+    f = f + log(sqrt((xG+1.2).^2 + (yG-bO).^2)) + log(sqrt((xG-2.2).^2 + (yG-bO).^2));
+    fx = fx + (xG+1.2)./((xG+1.2).^2 +(yG-bO).^2) + (xG-2.2)./((xG-2.2).^2 +(yG-bO).^2);
+    fy = fy + (yG-bO)./((xG+1.2).^2 +(yG-bO).^2) + (yG-bO)./((xG-2.2).^2 +(yG-bO).^2);
+    fNeato = fNeato + subs(poteq,[a,b], [-1.5,bO]) + subs(poteq,[a,b], [2.5,bO]);
     figure(2)
     hold on
     plot(-1.2,bO,'r.')
@@ -62,7 +62,7 @@ for i = 1:length(square_centers)
     for t = linspace(0,2*pi,45)
         aC = square_centers(i,1) + 0.25*cos(t);
         bC = square_centers(i,2) + 0.25*sin(t);
-        f = f - log(sqrt((xG-aC).^2 +(yG-bC).^2));
+        f = f + log(sqrt((xG-aC).^2 +(yG-bC).^2));
         fx = fx + (xG-aC)./((xG-aC).^2 +(yG-bC).^2);
         fy = fy + (yG-bC)./((xG-aC).^2 +(yG-bC).^2);
         fNeato = fNeato + subs(poteq,[a,b], [aC,bC]);
@@ -129,7 +129,7 @@ plot(R(end, 1), R(end, 2), "r.", "MarkerSize", 20)
 
 %set up Neato
 head = [1;0];
-pos = [0.25;-0.6];
+pos = [0;0];
 NeatoPath = [0,0];
 
 angSpeed = 0.2;  %rad/s (set higher than real to help with testing)
