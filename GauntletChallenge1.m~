@@ -114,7 +114,6 @@ end
 
 figure(2);
 plot(R(:, 1), R(:, 2), "r")
-hold on
 plot(R(:, 1), R(:, 2), "r.", "MarkerSize", 10)
 plot(R(1, 1), R(1, 2), "k.", "MarkerSize", 20)
 plot(R(end, 1), R(end, 2), "r.", "MarkerSize", 20)
@@ -152,7 +151,7 @@ while ~reachedbob
                 turnDir*angSpeed*base/2];
     send(pub, msg);
     startTurn = rostic;
-    while rostoc(startTurn) < 1.18*turnTime
+    while rostoc(startTurn) < 1.2*turnTime
         pause(0.01);
     end
     head = gradVal;
