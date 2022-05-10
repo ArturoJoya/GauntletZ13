@@ -1,4 +1,4 @@
-function NeatoPath = GauntletChallenge12()
+function NeatoPath = final_Gauntlet_Lvl1()
 
 syms xN yN a b
 poteq = log(sqrt((xN-a).^2 +(yN-b).^2));
