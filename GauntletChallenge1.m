@@ -32,8 +32,8 @@ syms xN yN a b
 poteq = log(sqrt((xN-a).^2 +(yN-b).^2));
 fNeato = 0;
 %global points
-%[xG,yG]=meshgrid(-1.5:0.01:2.5,-3.37:0.01:1);
-[xG,yG]=meshgrid(-5:0.01:5,-5:0.01:5);
+[xG,yG]=meshgrid(-1.5:0.01:2.5,-3.37:0.01:1);
+%[xG,yG]=meshgrid(-10:0.01:10,-10:0.01:10);
 
 %Outline
 for aO = -1.2:0.05:2.2
@@ -58,48 +58,39 @@ for bO = -3.07:0.05:0.7
 end
 %Squares as circles
 square_centers = [-0.25, -1; 1, -0.7; 1.41, -2]; 
+arbitrary_constant = 0.05;
 for i = 1:length(square_centers)
-    for t = linspace(0,2*pi,45)
+    for t = 0:0.4:2*pi
         aC = square_centers(i,1) + 0.25*cos(t);
         bC = square_centers(i,2) + 0.25*sin(t);
-        f = f + log(sqrt((xG-aC).^2 +(yG-bC).^2));
-        fx = fx + (xG-aC)./((xG-aC).^2 +(yG-bC).^2);
-        fy = fy + (yG-bC)./((xG-aC).^2 +(yG-bC).^2);
-        fNeato = fNeato + subs(poteq,[a,b], [aC,bC]);
+        f = f - arbitrary_constant.*log(sqrt((xG-aC).^2 +(yG-bC).^2));
+        fx = fx - arbitrary_constant.*(xG-aC)./((xG-aC).^2 +(yG-bC).^2);
+        fy = fy - arbitrary_constant.*(yG-bC)./((xG-aC).^2 +(yG-bC).^2);
+        fNeato = fNeato - arbitrary_constant.*subs(poteq,[a,b], [aC,bC]);
         figure(2)
         hold on
         plot(aC,bC,'r.')
     end
 end
 %BoB
-for t = linspace(0,2*pi,175)
+for t = 0:0.4:2*pi
     aC = 0.75 + 0.25*cos(t);
     bC = -2.5 + 0.25*sin(t);
-    f = f - log(sqrt((xG-aC).^2 +(yG-bC).^2));
-    fx = fx - (xG-aC)./((xG-aC).^2 +(yG-bC).^2);
-    fy = fy - (yG-bC)./((xG-aC).^2 +(yG-bC).^2);
-    fNeato = fNeato - subs(poteq,[a,b], [aC,bC]);
+    f = f + log(sqrt((xG-aC).^2 +(yG-bC).^2));
+    fx = fx + (xG-aC)./((xG-aC).^2 +(yG-bC).^2);
+    fy = fy + (yG-bC)./((xG-aC).^2 +(yG-bC).^2);
+    fNeato = fNeato + subs(poteq,[a,b], [aC,bC]);
     figure(2)
     hold on
     plot(aC,bC,'b.')
 end
-
 gradNeato = gradient(fNeato, [xN, yN]);
 
 contour(xG,yG,f, 'k', 'ShowText', 'On')
 quiver(xG,yG,fx,fy)
+contour3(xG, yG, f, 100)
+view([0 90])
 axis equal
-
-%Run gradient ascent
-%r_0 = [0, 0];
-%delta = 0.9; % delta > 1 causes stepsize to grow; this prevents convergence
-%lambda_0 = 0.05;
-%tolerance = 1e-3;
-%n_max = 25;
-
-% Run the algorithm
-%R = gradient_ascend(gradNeato, r_0, delta, lambda_0, tolerance, n_max);
-
 
 %Run gradient ascent
 r_i = [0; 0];
@@ -113,8 +104,8 @@ R = [r_i];
 
 % Run the algorithm
 %R = gradient_ascend(gradNeato, r_0, delta, lambda_0, tolerance, n_max);
-while (n < n_max) && (norm(grad_i)> tol)
-    r_i = r_i + lam.*grad_i;
+while (n < n_max) %&& (norm(grad_i)> tol)
+    r_i = r_i - lam.*grad_i;
     grad_i = (double(subs(gradNeato, {xN, yN}, {r_i(1), r_i(2)})));
     lam = delta * lam;
     n = n + 1;
@@ -150,8 +141,8 @@ pause(2);
 
 reachedbob = false;
 while ~reachedbob
-    %get gradient of position (for ascent
-    gradVal = double(subs(gradNeato, {xN, yN}, {pos(1), pos(2)}));
+    %get gradient of position (for descent
+    gradVal = -double(subs(gradNeato, {xN, yN}, {pos(1), pos(2)}));
     crossProd = cross([head; 0], [gradVal; 0]);
     turnDir = sign(crossProd(3));
     turnAngle = asin(norm(crossProd)/(norm(head)*norm(gradVal)));
@@ -160,7 +151,7 @@ while ~reachedbob
                 turnDir*angSpeed*base/2];
     send(pub, msg);
     startTurn = rostic;
-    while rostoc(startTurn) < turnTime
+    while rostoc(startTurn) < 1.2*turnTime
         pause(0.01);
     end
     head = gradVal;
