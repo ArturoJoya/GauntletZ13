@@ -180,5 +180,4 @@ while ~reachedbob
 end
 msg.Data = [0, 0];
 send(pub, msg);
-
 end
